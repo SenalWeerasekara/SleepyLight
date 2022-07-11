@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">SleepyLight</string>
+    <string name="et1">0</string>
+    <string name="btn1">START</string>
+
+    <string-array name="timers">
+        <item>10s</item>
+        <item>30s</item>
+        <item>45s</item>
+        <item>1m</item>
+        <item>2m</item>
+        <item>3m</item>
+        <item>4m</item>
+        <item>5m</item>
+        <item>10m</item>
+        <item>15m</item>
+        <item>20m</item>
+        <item>30m</item>
+        <item>45m</item>
+        <item>60m</item>
+    </string-array>
+</resources>
