@@ -119,16 +119,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-//        int myNum = 0;
-//        try {
-//            myNum = Integer.parseInt(et1.getText().toString());
-//        } catch(NumberFormatException nfe) {
-//            System.out.println("Could not parse " + nfe);
-//        }
-//
-//        counter = myNum;
-
-
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +126,13 @@ public class MainActivity extends AppCompatActivity {
                 btn2.setVisibility(View.VISIBLE);
                 btn.setVisibility(View.GONE);
                 flashlight(true);
+
+                try {
+                    counter = Integer.parseInt(et1.getText().toString());
+                } catch(NumberFormatException nfe) {
+                    System.out.println("Could not parse " + nfe);
+                }
+
                 cdt1 = new CountDownTimer(30000, 1000){
                     public void onTick(long millisUntilFinished){
                         et1.setText(String.valueOf(counter));
