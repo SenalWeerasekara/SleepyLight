@@ -12,3 +12,5 @@ hell nahh.
 And yes i know google assistant is a thing but i prefer not to scream at night telling google to turn off my light and accidentally call 911. 
 
 This is my second application which is made for my personal needs. First application is not on my github. 
+
+Made using Android Studio. Java. 
