@@ -1,8 +1,15 @@
 package com.example.sleepylight;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static android.Manifest.permission.FOREGROUND_SERVICE;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Camera;
@@ -21,18 +28,29 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     TextView tv1;
-//    static EditText et1;
     NumberPicker np1;
     String[] timers;
-    Button btn;
-    Button btn2;
-
-//    public CountDownTimer cdt1;
+    static Button btn;
+    static Button btn2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActivityCompat.requestPermissions(this, new String[]{FOREGROUND_SERVICE}, PackageManager.PERMISSION_GRANTED);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("count");
+
+        BroadcastReceiver broadcaster = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                service.et1.setText(String.valueOf(intent.getIntExtra("timeRemaining", 0)));
+            }
+        };
+
+        registerReceiver(broadcaster, intentFilter);
 
         Intent intent = new Intent(MainActivity.this, service.class);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -43,17 +61,13 @@ public class MainActivity extends AppCompatActivity {
         btn = findViewById(R.id.btn_start);
         btn2 = findViewById(R.id.btn3);
 
-
-
         np1.setMinValue(1);
         np1.setMaxValue(14);
         np1.setDisplayedValues(timers);
         service.et1.setText("10");
         service.counter = 10;
 
-
         btn2.setVisibility(View.GONE);
-//        stopButton.setVisibility(View.VISIBLE);
 
         np1.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
@@ -121,66 +135,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-//                Toast.makeText(getApplicationContext(),"Hello Javatpoint",Toast.LENGTH_SHORT).show();
                 startService(intent);
 
                 btn2.setVisibility(View.VISIBLE);
                 btn.setVisibility(View.GONE);
-//                flashlight(true);
-
-//                try {
-//                    counter = Integer.parseInt(et1.getText().toString());
-//                } catch(NumberFormatException nfe) {
-//                    System.out.println("Could not parse " + nfe);
-//                }
-//
-//                cdt1 = new CountDownTimer(30000, 1000){
-//                    public void onTick(long millisUntilFinished){
-//                        et1.setText(String.valueOf(counter));
-//                        counter--;
-//
-//                        if (counter < 0){
-//                            flashlight(false);
-//                            cdt1.cancel();
-//                        }
-//                    }
-//                    public  void onFinish(){
-////                        textView.setText("FINISH!!");
-//                    }
-//                }.start();
             }
         });
 
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                service.tt.cancel();
+                stopService(intent);
+                flashlight(false);
 
-                service.cdt1.cancel();
-//                stopService(intent);
-
+                Toast.makeText(getApplicationContext(),"stiooping",Toast.LENGTH_SHORT).show();
                 btn.setVisibility(View.VISIBLE);
                 btn2.setVisibility(View.GONE);
-                try {
-                    service.counter = Integer.parseInt(service.et1.getText().toString());
-                } catch(NumberFormatException nfe) {
-                    System.out.println("Could not parse " + nfe);
-                }
-//                flashlight(false);
             }
         });
     }
 
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//    }
+    public void flashlight(boolean input){
+        if (this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)){
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                CameraManager camMan = (CameraManager) getSystemService(CAMERA_SERVICE);
+                String camID = null;
+                try {
+                    camID = camMan.getCameraIdList()[0];
+                    camMan.setTorchMode(camID, input);
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            else{
+                Toast.makeText(this, "This Version of Android is too old", Toast.LENGTH_LONG).show();
+            }
 
+        } else {
+            Toast.makeText(this, "No Flash", Toast.LENGTH_LONG).show();
+        }
+    }
 
 }
 

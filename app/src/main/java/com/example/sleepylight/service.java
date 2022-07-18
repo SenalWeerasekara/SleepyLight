@@ -10,22 +10,25 @@ import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class service extends Service {
-    
 
-    public static CountDownTimer cdt1;
     static EditText et1;
     public static int counter;
+    static TimerTask tt;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         flashlight(true);
         Toast.makeText(getApplicationContext(),"torch",Toast.LENGTH_SHORT).show();
 
@@ -35,23 +38,33 @@ public class service extends Service {
             System.out.println("Could not parse " + nfe);
         }
 
-        cdt1 = new CountDownTimer(600000, 1000){
-            public void onTick(long millisUntilFinished){
-                et1.setText(String.valueOf(counter));
+        Timer timer = new Timer();
+        long startTime = 0;
+        long offsetTime = 1000;
+
+        tt = new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent2 = new Intent();
+                intent2.setAction("count");
                 counter--;
-
-                if (counter < 0){
+                if (counter <= 0){
+                    timer.cancel();
                     flashlight(false);
-                    cdt1.cancel();
+                    MainActivity.btn.setVisibility(View.VISIBLE);
+                    MainActivity.btn2.setVisibility(View.GONE);
                 }
+
+                intent2.putExtra("timeRemaining", counter );
+                sendBroadcast(intent2);
             }
-            public  void onFinish(){
-//                        textView.setText("FINISH!!");
-            }
-        }.start();
+        };
 
+        try {
+            timer.scheduleAtFixedRate(tt, startTime, offsetTime);
+        } catch (Exception e) {
 
-
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
