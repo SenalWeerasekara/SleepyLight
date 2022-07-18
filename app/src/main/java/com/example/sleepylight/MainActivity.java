@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
-
     TextView tv1;
     NumberPicker np1;
     String[] timers;
